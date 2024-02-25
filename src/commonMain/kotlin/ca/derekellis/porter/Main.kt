@@ -1,5 +1,5 @@
 package ca.derekellis.porter
 
-fun main(vararg args: String) {
-  println("Hello World!")
+fun main(vararg argv: String) {
+  Porter().main(argv)
 }

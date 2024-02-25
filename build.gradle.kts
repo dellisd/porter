@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+
 plugins {
   alias(libs.plugins.kotlin.multiplatform)
   alias(libs.plugins.kotlin.serialization)
@@ -17,9 +19,29 @@ kotlin {
     commonMain.dependencies {
       implementation(libs.clikt)
       implementation(libs.coroutines)
+      implementation(libs.ktor.client)
       implementation(libs.mosaic)
+      implementation(libs.okio)
       implementation(libs.serialization)
       implementation(libs.yamlkt)
+    }
+
+    appleMain.dependencies {
+      implementation(libs.ktor.client.cio)
+    }
+
+    linuxMain.dependencies {
+      implementation(libs.ktor.client.cio)
+    }
+
+    mingwMain.dependencies {
+      implementation(libs.ktor.client.winhttp)
+    }
+  }
+
+  targets.withType<KotlinNativeTarget>().configureEach {
+    binaries.executable {
+      entryPoint("ca.derekellis.porter.main")
     }
   }
 }
