@@ -7,12 +7,15 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import ca.derekellis.porter.manifest.Asset
 import ca.derekellis.porter.manifest.ManifestReader
+import ca.derekellis.porter.mosaic.Asset
+import ca.derekellis.porter.mosaic.DownloadingAsset
 import ca.derekellis.porter.platformEngine
 import ca.derekellis.porter.repository.Downloader
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
 import com.jakewharton.mosaic.runMosaicBlocking
+import com.jakewharton.mosaic.ui.Color
 import com.jakewharton.mosaic.ui.Column
 import com.jakewharton.mosaic.ui.Text
 import io.ktor.client.HttpClient
@@ -59,6 +62,7 @@ class Sync : CliktCommand() {
         }
       }
 
+      // TODO: Download files in parallel, and check if download is needed
       launch(Dispatchers.IO) {
         for (asset in manifest.assets) {
           inProgress[asset] = 0
@@ -72,16 +76,5 @@ class Sync : CliktCommand() {
     }
   }
 
-  @Composable
-  private fun Asset(asset: Asset) {
-    Text(value = asset.name)
-  }
 
-  @Composable
-  private fun DownloadingAsset(asset: Asset, progress: Int) {
-    Column {
-      Text(value = "${asset.name} ($progress/100)%")
-      Text(value = "  ${asset.url}")
-    }
-  }
 }
