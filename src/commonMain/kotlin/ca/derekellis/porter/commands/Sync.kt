@@ -62,6 +62,7 @@ class Sync : StandardPorterCommand() {
           inProgress.remove(asset)
           completed.add(asset)
         }
+        downloader.cleanupTempFiles()
       }.join()
     }
   }

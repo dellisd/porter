@@ -1,5 +1,6 @@
 package ca.derekellis.porter.repository
 
+import ca.derekellis.porter.platformTempDir
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.prepareGet
@@ -18,6 +19,14 @@ class Downloader(
   private val httpClient: HttpClient,
   private val fileSystem: FileSystem = FileSystem.SYSTEM,
 ) {
+  private val tempPath = platformTempDir() / "porter-temp"
+
+  init {
+    if (!fileSystem.exists(tempPath)) {
+      fileSystem.createDirectories(tempPath)
+    }
+  }
+
   /**
    * Download a file at [url] to the [destination].
    * @param progress Callback that reports download progress in the range of `0..100`.
@@ -30,10 +39,17 @@ class Downloader(
       }
     }
 
+    val tempDestination = tempPath / destination.name
     request.execute { httpResponse ->
       val channel = httpResponse.bodyAsChannel()
-      fileSystem.copy(channel, destination)
+      fileSystem.copy(channel, tempDestination)
     }
+
+    fileSystem.copy(tempDestination, destination)
+  }
+
+  fun cleanupTempFiles() {
+    fileSystem.deleteRecursively(tempPath)
   }
 
   private suspend fun FileSystem.copy(source: ByteReadChannel, target: Path) {
