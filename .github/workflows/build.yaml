@@ -1,0 +1,47 @@
+name: build
+
+on:
+  pull_request: {}
+  workflow_dispatch: {}
+  push:
+    branches:
+      - 'trunk'
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -Dorg.gradle.daemon=false -Dkotlin.incremental=false"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macOS-14
+            task: linkReleaseExecutableMacosArm64
+            target: 'macosArm64'
+          - os: ubuntu-latest
+            task: linkReleaseExecutableLinuxX64
+            target: 'linuxX64'
+          - os: windows-latest
+            task: linkReleaseExecutableMingwX64
+            target: 'mingwX64'
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v3
+        continue-on-error: true
+
+      - run: ./gradlew ${{ matrix.task }}
+
+      - name: Upload distribution
+        uses: actions/upload-artifact@v4
+        with:
+          name: porter-${{ matrix.target }}
+          path: build/bin/${{ matrix.target }}/releaseExecutable/porter.kexe
+          if-no-files-found: 'error'

@@ -36,11 +36,11 @@ kotlin {
     }
 
     appleMain.dependencies {
-      implementation(libs.ktor.client.cio)
+      implementation(libs.ktor.client.curl)
     }
 
     linuxMain.dependencies {
-      implementation(libs.ktor.client.cio)
+      implementation(libs.ktor.client.curl)
     }
 
     mingwMain.dependencies {
