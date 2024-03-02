@@ -34,8 +34,12 @@ class Downloader(
   suspend fun get(url: Url, destination: Path, progress: (Int) -> Unit) {
     val request = httpClient.prepareGet(url) {
       onDownload { bytesSentTotal, contentLength ->
-        val percent = ((bytesSentTotal.toDouble() / contentLength) * 100).toInt()
-        progress(percent)
+        if (contentLength < 0) {
+          progress(0)
+        } else {
+          val percent = ((bytesSentTotal.toDouble() / contentLength) * 100).toInt()
+          progress(percent)
+        }
       }
     }
 

@@ -7,9 +7,9 @@ import com.jakewharton.mosaic.ui.Text
 
 @Composable
 fun Asset(asset: Asset, synced: Boolean = true) {
-  val displayName = if (synced) asset.name else "${asset.name} (Not Synced)"
-  Text(
-    value = displayName,
-    color = if (synced) Color.Green else Color.Yellow,
-  )
+  if (synced) {
+    Text(value = "✓ ${asset.name}", color = Color.Green)
+  } else {
+    Text(value = "• ${asset.name} (Not Synced)", color = Color.Yellow)
+  }
 }

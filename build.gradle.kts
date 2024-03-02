@@ -26,6 +26,15 @@ kotlin {
       implementation(libs.yamlkt)
     }
 
+    commonTest.dependencies {
+      implementation(libs.assertk)
+      implementation(libs.coroutines.test)
+      implementation(libs.ktor.client.mock)
+      implementation(libs.okio.fakeFilesystem)
+      implementation(libs.turbine)
+      implementation(kotlin("test"))
+    }
+
     appleMain.dependencies {
       implementation(libs.ktor.client.cio)
     }
