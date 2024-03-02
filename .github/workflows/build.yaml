@@ -47,5 +47,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: porter-${{ matrix.target }}
-          path: build/bin/${{ matrix.target }}/releaseExecutable/porter.kexe
+          path: ./build/bin/${{ matrix.target }}/releaseExecutable/porter.kexe
           if-no-files-found: 'error'
