@@ -1,5 +1,6 @@
 package ca.derekellis.porter.commands
 
+import ca.derekellis.porter.path
 import ca.derekellis.porter.platformEngine
 import ca.derekellis.porter.repository.Downloader
 import ca.derekellis.porter.repository.Repository
@@ -13,21 +14,25 @@ import okio.FileSystem
 import okio.Path.Companion.toPath
 
 abstract class StandardPorterCommand(protected val fileSystem: FileSystem) : CliktCommand() {
-  protected val manifestPath by argument(name = "manifest").default("porter.yaml")
-  protected val destination by argument(name = "dest").default("data/")
+  protected val manifestPath by argument(name = "manifest")
+    .path(mustExist = true, canBeFile = false, fileSystem = fileSystem)
+    .default("porter.yaml".toPath())
+
+  protected val destination by argument(name = "dest")
+    .path(canBeFile = false, fileSystem = fileSystem)
+    .default("data/".toPath())
 
   protected open val repository: Repository by lazy {
     Repository(
-      root = destination.toPath(),
+      root = destination,
       downloader = Downloader(HttpClient(platformEngine())),
       fileSystem = fileSystem,
     )
   }
 
   final override fun run() {
-    val destinationPath = destination.toPath()
-    if (!fileSystem.exists(destinationPath)) {
-      fileSystem.createDirectories(destinationPath)
+    if (!fileSystem.exists(destination)) {
+      fileSystem.createDirectories(destination)
     }
 
     runMosaicBlocking {

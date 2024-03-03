@@ -19,7 +19,6 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import okio.FileSystem
-import okio.Path.Companion.toPath
 
 @Stable
 class Sync : StandardPorterCommand(FileSystem.SYSTEM) {
@@ -28,7 +27,7 @@ class Sync : StandardPorterCommand(FileSystem.SYSTEM) {
 
   override val repository: Repository by lazy {
     Repository(
-      root = destination.toPath(),
+      root = destination,
       downloader = downloader,
       fileSystem = fileSystem,
       listener = Listener()
@@ -39,7 +38,7 @@ class Sync : StandardPorterCommand(FileSystem.SYSTEM) {
   private val inProgress = mutableStateMapOf<Asset, Int>()
 
   override suspend fun MosaicScope.mosaicRun() {
-    val manifest = manifestReader.read(manifestPath.toPath())
+    val manifest = manifestReader.read(manifestPath)
 
     setContent {
       Column {

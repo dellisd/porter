@@ -5,15 +5,14 @@ import ca.derekellis.porter.mosaic.Asset
 import com.jakewharton.mosaic.MosaicScope
 import com.jakewharton.mosaic.ui.Column
 import okio.FileSystem
-import okio.Path.Companion.toPath
 
 class List : StandardPorterCommand(FileSystem.SYSTEM) {
   private val manifestReader = ManifestReader()
 
   override suspend fun MosaicScope.mosaicRun() {
-    val manifest = manifestReader.read(manifestPath.toPath())
+    val manifest = manifestReader.read(manifestPath)
 
-    val dataPath = destination.toPath()
+    val dataPath = destination
     if (!fileSystem.exists(dataPath)) {
       fileSystem.createDirectories(dataPath)
     }
