@@ -9,6 +9,7 @@ import ca.derekellis.porter.manifest.ManifestReader
 import ca.derekellis.porter.mosaic.Asset
 import ca.derekellis.porter.mosaic.DownloadingAsset
 import ca.derekellis.porter.platformEngine
+import ca.derekellis.porter.repository.AssetState
 import ca.derekellis.porter.repository.Downloader
 import ca.derekellis.porter.repository.Repository
 import com.jakewharton.mosaic.MosaicScope
@@ -34,7 +35,7 @@ class Sync : StandardPorterCommand(FileSystem.SYSTEM) {
     )
   }
 
-  private val completed = mutableStateListOf<Asset>()
+  private val completed = mutableStateListOf<CompletedAsset>()
   private val inProgress = mutableStateMapOf<Asset, Int>()
 
   override suspend fun MosaicScope.mosaicRun() {
@@ -42,8 +43,8 @@ class Sync : StandardPorterCommand(FileSystem.SYSTEM) {
 
     setContent {
       Column {
-        for (asset in completed) {
-          Asset(asset)
+        for ((asset, state) in completed) {
+          Asset(asset, state)
         }
         for ((asset, progress) in inProgress) {
           DownloadingAsset(asset, progress)
@@ -73,11 +74,18 @@ class Sync : StandardPorterCommand(FileSystem.SYSTEM) {
 
     override fun downloadSuccess(asset: Asset) {
       inProgress.remove(asset)
-      completed.add(asset)
+      completed.add(CompletedAsset(asset, AssetState.Success))
     }
 
     override fun downloadSkipped(asset: Asset) {
-      completed.add(asset)
+      completed.add(CompletedAsset(asset, AssetState.Success))
+    }
+
+    override fun downloadFail(asset: Asset, exception: Exception) {
+      inProgress.remove(asset)
+      completed.add(CompletedAsset(asset, AssetState.Failed(exception)))
     }
   }
+
+  private data class CompletedAsset(val asset: Asset, val state: AssetState)
 }

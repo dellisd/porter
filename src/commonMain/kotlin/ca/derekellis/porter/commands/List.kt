@@ -2,6 +2,7 @@ package ca.derekellis.porter.commands
 
 import ca.derekellis.porter.manifest.ManifestReader
 import ca.derekellis.porter.mosaic.Asset
+import ca.derekellis.porter.repository.AssetState
 import com.jakewharton.mosaic.MosaicScope
 import com.jakewharton.mosaic.ui.Column
 import okio.FileSystem
@@ -20,7 +21,7 @@ class List : StandardPorterCommand(FileSystem.SYSTEM) {
     setContent {
       Column {
         for (asset in manifest.assets) {
-          Asset(asset, synced = repository.isSynced(asset))
+          Asset(asset, state = if (repository.isSynced(asset)) AssetState.Success else AssetState.NotSynced)
         }
       }
     }

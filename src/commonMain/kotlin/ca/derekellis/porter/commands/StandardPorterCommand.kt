@@ -7,6 +7,9 @@ import ca.derekellis.porter.repository.Repository
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.default
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
+import com.github.ajalt.clikt.parameters.options.option
 import com.jakewharton.mosaic.MosaicScope
 import com.jakewharton.mosaic.runMosaicBlocking
 import io.ktor.client.HttpClient
@@ -21,6 +24,8 @@ abstract class StandardPorterCommand(protected val fileSystem: FileSystem) : Cli
   protected val destination by argument(name = "dest")
     .path(canBeFile = false, fileSystem = fileSystem)
     .default("data/".toPath())
+
+  protected val verbose by option("--verbose").flag(default = false)
 
   protected open val repository: Repository by lazy {
     Repository(

@@ -43,13 +43,23 @@ class Downloader(
       }
     }
 
-    val tempDestination = tempPath / destination.name
+
+    val tempDestination = tempPath / destination.nameBytes.sha256().hex()
     request.execute { httpResponse ->
       val channel = httpResponse.bodyAsChannel()
       fileSystem.copy(channel, tempDestination)
     }
 
+    ensureDirectoriesCreated(destination)
     fileSystem.copy(tempDestination, destination)
+  }
+
+  private fun ensureDirectoriesCreated(target: Path) {
+    target.parent?.let { parent ->
+      if (!fileSystem.exists(parent)) {
+        fileSystem.createDirectories(parent)
+      }
+    }
   }
 
   fun cleanupTempFiles() {
